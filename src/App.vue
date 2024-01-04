@@ -1,11 +1,13 @@
 <template>
-  <v-chart
-    class="chart"
-    ref="chartRef"
-    :option="chartOption"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
-  ></v-chart>
+  <div @contextmenu.prevent="handleRightClick">
+    <v-chart
+      class="chart"
+      ref="chartRef"
+      :option="chartOption"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
+    ></v-chart>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -47,6 +49,14 @@ const chartRef = ref<typeof VChart | null>(null);
 const draggingLine = ref<String | null>(null);
 const chartOption = ref({
   animation: false,
+  tooltip: {
+    show: true,
+    trigger: "axis",
+    axisPointer: {
+      type: "cross",
+      snap: true,
+    },
+  },
   grid: {
     top: 40,
     left: 50,
@@ -208,7 +218,7 @@ function onMouseMove(event: MouseEvent) {
       pixelPoint
     );
 
-    if (dataPoint) {
+    if (dataPoint && dataPoint[0]) {
       let newYValue = Math.round(dataPoint[1] * 10) / 10;
       newYValue = Math.min(4, Math.max(0, newYValue));
 
@@ -221,19 +231,107 @@ function onMouseMove(event: MouseEvent) {
   }
 }
 
-function onMouseUp() {
+function onMouseUp() {}
+function handleRightClick() {}
+
+function onMouseClick(event: MouseEvent) {
+  if (!isDragging) {
+    const x = event.clientX;
+    const y = event.clientY;
+    const pixelPoint: [number, number] = [x, y];
+    const dataPoint = chartRef.value?.convertFromPixel(
+      { seriesIndex: 0 },
+      pixelPoint
+    );
+    if (dataPoint) {
+      dataPoint[0] = Math.round(dataPoint[0] * 10) / 10;
+      if (dataPoint[0] < 0) {
+        dataPoint[0] = 0;
+      }
+      if (dataPoint[0] > 60) {
+        dataPoint[0] = 60;
+      }
+      dataPoint[1] = Math.round(dataPoint[1] * 10) / 10;
+      if (dataPoint[1] < 0) {
+        dataPoint[1] = 0;
+      }
+      if (dataPoint[1] > 4) {
+        dataPoint[1] = 4;
+      }
+      let insertIndex = data.length;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i][1] >= dataPoint[1]) {
+          insertIndex = i;
+          break;
+        }
+      }
+
+      data.splice(insertIndex, 0, dataPoint);
+
+      chartRef.value?.setOption({
+        series: [
+          {
+            data: data,
+          },
+        ],
+      });
+    }
+  }
+
   isDragging = false;
   draggingLine.value = null;
+}
+
+function onRightClick(params: ECElementEvent) {
+  debugger;
+  if (!isDragging) {
+    const x = params.clientX;
+    const y = params.clientY;
+    const pixelPoint: [number, number] = [x, y];
+    const dataPoint = chartRef.value?.convertFromPixel(
+      { seriesIndex: 0 },
+      pixelPoint
+    );
+    if (dataPoint) {
+      if (data.length == 0) {
+        return;
+      } else if (data.length == 1) {
+        data.pop();
+      } else if (data.length > 1) {
+        let popIndex = 0;
+        let min = Math.abs(data[0][1] - dataPoint[1]);
+        for (let i = 1; i < data.length; i++) {
+          let temp =
+            Math.abs(data[i][0] - dataPoint[0]) +
+            Math.abs(data[i][1] - dataPoint[1]);
+          if (temp < min) {
+            min = temp;
+            popIndex = i;
+          }
+        }
+        data.splice(popIndex, 1);
+      }
+      chartRef.value?.setOption({
+        series: [
+          {
+            data: data,
+          },
+        ],
+      });
+    }
+  }
 }
 
 onMounted(() => {
   const chartDom = chartRef.value?.getDom();
   chartDom?.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseup", onMouseUp); // 添加这一行
+  chartDom?.addEventListener("click", onMouseClick);
+  chartDom?.addEventListener("contextmenu", onRightClick);
+  window.addEventListener("mouseup", onMouseUp);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("mouseup", onMouseUp); // 也在这里移除事件监听器
+  window.removeEventListener("mouseup", onMouseUp);
 });
 </script>
 
