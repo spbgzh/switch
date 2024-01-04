@@ -88,6 +88,13 @@ const chartOption = ref({
           oopacity: 0.8,
           shadowColor: "rgba(0, 0, 0, 0.2)",
         },
+        label: {
+          show: true,
+          formatter: "Press Trigger: {c} mm",
+          position: "middle",
+          fontSize : 14,
+          color: "rgba(83, 111, 195, 1)",
+        },
         emphasis: {
           lineStyle: {
             width: 4,
@@ -119,6 +126,13 @@ const chartOption = ref({
           shadowBlur: 10,
           opacity: 0.8,
           shadowColor: "rgba(0, 0, 0, 0.2)",
+        },
+        label: {
+          show: true,
+          formatter: "Lift Trigger: {c} mm",
+          position: "middle",
+          fontSize : 14,
+          color: "red",
         },
         emphasis: {
           lineStyle: {
@@ -190,7 +204,7 @@ onUnmounted(() => {
 
 <style scoped>
 .chart {
-  height: 500px;
-  width: 500px;
+  height: 400px;
+  width: 400px;
 }
 </style>
