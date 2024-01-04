@@ -162,10 +162,12 @@ function onMouseMove(event: MouseEvent) {
     );
 
     if (dataPoint) {
+      const newYValue = Math.min(4, Math.max(0, dataPoint[1]));
+      
       if (draggingLine.value === "1") {
-        line1.value = dataPoint[1];
+        line1.value = newYValue;
       } else if (draggingLine.value === "2") {
-        line2.value = dataPoint[1];
+        line2.value = newYValue;
       }
     }
   }
