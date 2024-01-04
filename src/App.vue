@@ -17,6 +17,7 @@ import VChart from "vue-echarts";
 const line1 = ref(0.1);
 const line2 = ref(1.5);
 const chartRef = ref<typeof VChart | null>(null);
+const draggingLine = ref<String | null>(null);
 const chartOption = ref({
   animation: false,
   grid: {
@@ -97,8 +98,9 @@ const chartOption = ref({
         },
         data: [
           {
-            name: "2",
+            name: "Line 1",
             yAxis: line1,
+            id: "1",
           },
         ],
         silent: false,
@@ -128,8 +130,9 @@ const chartOption = ref({
         },
         data: [
           {
-            name: "2",
+            name: "Line 2",
             yAxis: line2,
+            id: "2",
           },
         ],
         silent: false,
@@ -137,45 +140,45 @@ const chartOption = ref({
     },
   ],
 });
-
 let isDragging = false;
 
 function onMouseDown(params: ECElementEvent) {
-  isDragging = true;
-  updateLine1(params);
-}
-
-function onMouseMove(params: ECElementEvent) {
-  if (isDragging) {
-    updateLine1(params);
+  debugger
+  if (params.componentType === 'markLine' && params.data.id) {
+    draggingLine.value = params.data.id;
+    isDragging = true;
   }
 }
 
-function onMouseUp() {
-  isDragging = false;
-}
-
-function updateLine1(params: ECElementEvent) {
+function onMouseMove(event: MouseEvent) {
   if (isDragging && chartRef.value) {
     const rect = chartRef.value.getDom().getBoundingClientRect();
-    const x = params.clientX - rect.left;
-    const y = params.clientY - rect.top;
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
     const pixelPoint: [number, number] = [x, y];
     const dataPoint = chartRef.value.convertFromPixel(
       { seriesIndex: 0 },
       pixelPoint
     );
+
     if (dataPoint) {
-      line1.value = dataPoint[1]; // 假设 Y 轴是我们需要更新的
+      if (draggingLine.value === "1") {
+        line1.value = dataPoint[1];
+      } else if (draggingLine.value === "2") {
+        line2.value = dataPoint[1];
+      }
     }
   }
+}
+
+function onMouseUp() {
+  isDragging = false;
+  draggingLine.value = null;
 }
 
 onMounted(() => {
   const chartDom = chartRef.value?.getDom();
   chartDom?.addEventListener("mousemove", onMouseMove);
-  chartDom?.addEventListener("mousedown", onMouseDown);
-  window.addEventListener("mouseup", onMouseUp);
 });
 
 onUnmounted(() => {
