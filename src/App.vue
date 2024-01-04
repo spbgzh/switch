@@ -63,7 +63,6 @@ const chartOption = ref({
     max: 60,
     minorTick: {
       show: true,
-      splitNumber: 10,
     },
     splitLine: {
       lineStyle: {
@@ -88,7 +87,6 @@ const chartOption = ref({
     max: 4,
     minorTick: {
       show: true,
-      splitNumber: 10,
     },
     splitLine: {
       lineStyle: {
