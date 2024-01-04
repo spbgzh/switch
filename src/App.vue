@@ -234,8 +234,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("mouseup", onMouseUp); // 也在这里移除事件监听器
-
+   window.removeEventListener("mouseup", onMouseUp); // 也在这里移除事件监听器
 });
 </script>
 
