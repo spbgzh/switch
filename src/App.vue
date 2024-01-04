@@ -201,8 +201,8 @@ const chartOption = ref({
 let isDragging = false;
 
 function onMouseDown(params: ECElementEvent) {
-  if (params.componentType === "markLine" && params.data.id) {
-    draggingLine.value = params.data.id;
+  if (params.componentType === "markLine" && (params.data as any).id) {
+    draggingLine.value = (params.data as any).id;
     isDragging = true;
   }
 }
