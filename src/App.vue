@@ -63,6 +63,7 @@ const chartOption = ref({
     max: 60,
     minorTick: {
       show: true,
+      splitNumber: 10,
     },
     splitLine: {
       lineStyle: {
@@ -87,6 +88,7 @@ const chartOption = ref({
     max: 4,
     minorTick: {
       show: true,
+      splitNumber: 10,
     },
     splitLine: {
       lineStyle: {
@@ -189,7 +191,6 @@ const chartOption = ref({
 let isDragging = false;
 
 function onMouseDown(params: ECElementEvent) {
-  debugger;
   if (params.componentType === "markLine" && params.data.id) {
     draggingLine.value = params.data.id;
     isDragging = true;
@@ -232,7 +233,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-   window.removeEventListener("mouseup", onMouseUp); // 也在这里移除事件监听器
+  window.removeEventListener("mouseup", onMouseUp); // 也在这里移除事件监听器
 });
 </script>
 
