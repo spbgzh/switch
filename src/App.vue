@@ -16,6 +16,33 @@ import VChart from "vue-echarts";
 
 const line1 = ref(0.1);
 const line2 = ref(1.5);
+const data = [
+  [19.392, 0.0128],
+  [24.234, 0.0578],
+  [27.206, 0.4376],
+  [29.582, 0.7567],
+  [30.753, 1.0303],
+  [33.157, 1.1669],
+  [39.807, 1.2725],
+  [45.856, 1.3478],
+  [48.265, 1.454],
+  [45.826, 1.5455],
+  [40.966, 1.6222],
+  [35.496, 1.7293],
+  [28.81, 1.8519],
+  [22.13, 1.944],
+  [20.904, 2.0354],
+  [23.92, 2.1262],
+  [31.785, 2.2165],
+  [42.681, 2.3064],
+  [51.756, 2.4117],
+  [54.77, 2.5178],
+  [55.339, 2.761],
+  [56.515, 3.0042],
+  [58.296, 3.2474],
+  [60, 3.5057],
+];
+
 const chartRef = ref<typeof VChart | null>(null);
 const draggingLine = ref<String | null>(null);
 const chartOption = ref({
@@ -33,9 +60,10 @@ const chartOption = ref({
       padding: [10, 0, 0, 0],
     },
     min: 0,
-    max: 50,
+    max: 60,
     minorTick: {
       show: true,
+      splitNumber: 10,
     },
     splitLine: {
       lineStyle: {
@@ -60,6 +88,7 @@ const chartOption = ref({
     max: 4,
     minorTick: {
       show: true,
+      splitNumber: 10,
     },
     splitLine: {
       lineStyle: {
@@ -76,7 +105,12 @@ const chartOption = ref({
 
   series: [
     {
-      data: [1, 2],
+      data: data,
+      type: "line",
+      smooth: true, // 开启平滑曲线
+    },
+    {
+      data: [],
       type: "line",
       markLine: {
         symbol: "none",
@@ -92,8 +126,8 @@ const chartOption = ref({
           show: true,
           formatter: "Press Trigger: {c} mm",
           position: "middle",
-          fontSize : 14,
-          color: "rgba(83, 111, 195, 1)",
+          fontSize: 14,
+          color: "rgba(143, 200, 115, 1)",
         },
         emphasis: {
           lineStyle: {
@@ -124,21 +158,21 @@ const chartOption = ref({
           type: "solid",
           width: 3,
           shadowBlur: 10,
-          opacity: 0.8,
+          opacity: 0.7,
           shadowColor: "rgba(0, 0, 0, 0.2)",
         },
         label: {
           show: true,
           formatter: "Lift Trigger: {c} mm",
           position: "middle",
-          fontSize : 14,
+          fontSize: 14,
           color: "red",
         },
         emphasis: {
           lineStyle: {
             width: 4,
             shadowBlur: 10,
-            opacity: 0.9,
+            opacity: 0.8,
             shadowColor: "rgba(0, 0, 0, 0.3)",
           },
         },
@@ -157,8 +191,8 @@ const chartOption = ref({
 let isDragging = false;
 
 function onMouseDown(params: ECElementEvent) {
-  debugger
-  if (params.componentType === 'markLine' && params.data.id) {
+  debugger;
+  if (params.componentType === "markLine" && params.data.id) {
     draggingLine.value = params.data.id;
     isDragging = true;
   }
@@ -176,8 +210,9 @@ function onMouseMove(event: MouseEvent) {
     );
 
     if (dataPoint) {
-      const newYValue = Math.min(4, Math.max(0, dataPoint[1]));
-      
+      let newYValue = Math.round(dataPoint[1] * 10) / 10;
+      newYValue = Math.min(4, Math.max(0, newYValue));
+
       if (draggingLine.value === "1") {
         line1.value = newYValue;
       } else if (draggingLine.value === "2") {
@@ -204,7 +239,7 @@ onUnmounted(() => {
 
 <style scoped>
 .chart {
-  height: 400px;
-  width: 400px;
+  height: 600px;
+  width: 600px;
 }
 </style>
