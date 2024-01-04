@@ -230,10 +230,12 @@ function onMouseUp() {
 onMounted(() => {
   const chartDom = chartRef.value?.getDom();
   chartDom?.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mouseup", onMouseUp); // 添加这一行
 });
 
 onUnmounted(() => {
-  window.removeEventListener("mouseup", onMouseUp);
+  window.removeEventListener("mouseup", onMouseUp); // 也在这里移除事件监听器
+
 });
 </script>
 
